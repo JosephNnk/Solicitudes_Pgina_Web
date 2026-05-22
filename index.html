@@ -165,6 +165,35 @@
         width: 100%;
       }
 
+      .iti__dropdown-content {
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 18px 35px rgba(2, 6, 23, 0.6);
+        color: var(--text);
+      }
+
+      .iti__country-list {
+        background: transparent;
+      }
+
+      .iti__search-input {
+        background: rgba(2, 6, 23, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        color: var(--text);
+      }
+
+      .iti__country {
+        color: var(--text);
+      }
+
+      .iti__country.iti__highlight {
+        background: rgba(56, 189, 248, 0.15);
+      }
+
+      .iti__divider {
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
       textarea {
         resize: vertical;
         min-height: 120px;
@@ -431,6 +460,7 @@
       const fileInput = document.getElementById("file");
       const submitButton = form.querySelector("button[type=submit]");
       const honeypotInput = document.getElementById("company");
+      let utilsReady = false;
 
       const MAX_FILE_BYTES = 5 * 1024 * 1024;
       const ALLOWED_MIME_TYPES = [
@@ -449,6 +479,16 @@
         utilsScript:
           "https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/js/utils.js",
       });
+
+      if (phoneInstance.promise) {
+        phoneInstance.promise
+          .then(() => {
+            utilsReady = true;
+          })
+          .catch(() => {
+            utilsReady = false;
+          });
+      }
 
       const readFileAsBase64 = (file) =>
         new Promise((resolve, reject) => {
@@ -473,7 +513,14 @@
           return;
         }
 
+        if (!utilsReady) {
+          phoneError.textContent = "Cargando validacion del telefono...";
+          phoneError.style.display = "block";
+          return;
+        }
+
         if (!phoneInstance.isValidNumber()) {
+          phoneError.textContent = "Ingresa un numero valido.";
           phoneError.style.display = "block";
           phoneInput.focus();
           return;
