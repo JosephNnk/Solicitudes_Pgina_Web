@@ -509,6 +509,15 @@
         return /^[67]\d{7}$/.test(digits);
       };
 
+      const buildPhonePayload = () => {
+        const isBolivia = phoneInstance.getSelectedCountryData().iso2 === "bo";
+        if (isBolivia && isValidBoliviaFallback()) {
+          const digits = getDigits(phoneInput.value);
+          return `+591${digits}`;
+        }
+        return phoneInstance.getNumber();
+      };
+
       const normalizePhoneInput = () => {
         const raw = phoneInput.value.trim();
         if (!raw) {
@@ -588,7 +597,7 @@
         const payload = {
           name: form.name.value.trim(),
           email: form.email.value.trim(),
-          phone: phoneInstance.getNumber(),
+          phone: buildPhonePayload(),
           notes: form.notes.value.trim(),
           file: fileBase64,
           fileMeta,
