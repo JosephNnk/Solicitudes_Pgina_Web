@@ -502,6 +502,13 @@
           reader.readAsDataURL(file);
         });
 
+      const getDigits = (value) => value.replace(/\D/g, "");
+
+      const isValidBoliviaFallback = () => {
+        const digits = getDigits(phoneInput.value);
+        return /^[67]\d{7}$/.test(digits);
+      };
+
       const normalizePhoneInput = () => {
         const raw = phoneInput.value.trim();
         if (!raw) {
@@ -544,8 +551,13 @@
 
         normalizePhoneInput();
 
-        if (!phoneInstance.isValidNumber()) {
-          phoneError.textContent = "Ingresa un numero valido.";
+        const isBolivia = phoneInstance.getSelectedCountryData().iso2 === "bo";
+        const isValidPhone =
+          phoneInstance.isValidNumber() ||
+          (isBolivia && isValidBoliviaFallback());
+
+        if (!isValidPhone) {
+          phoneError.textContent = "Ingresa un numero valido (8 digitos).";
           phoneError.style.display = "block";
           phoneInput.focus();
           return;
