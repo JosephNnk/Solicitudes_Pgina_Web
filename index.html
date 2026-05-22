@@ -543,18 +543,12 @@
           return;
         }
 
-        if (!utilsReady) {
-          phoneError.textContent = "Cargando validacion del telefono...";
-          phoneError.style.display = "block";
-          return;
-        }
-
         normalizePhoneInput();
 
         const isBolivia = phoneInstance.getSelectedCountryData().iso2 === "bo";
-        const isValidPhone =
-          phoneInstance.isValidNumber() ||
-          (isBolivia && isValidBoliviaFallback());
+        const isValidPhone = isBolivia
+          ? isValidBoliviaFallback()
+          : utilsReady && phoneInstance.isValidNumber();
 
         if (!isValidPhone) {
           phoneError.textContent = "Ingresa un numero valido (8 digitos).";
