@@ -502,6 +502,29 @@
           reader.readAsDataURL(file);
         });
 
+      const normalizePhoneInput = () => {
+        const raw = phoneInput.value.trim();
+        if (!raw) {
+          return;
+        }
+
+        if (raw.startsWith("+") || raw.startsWith("00")) {
+          phoneInstance.setNumber(raw);
+          if (window.intlTelInputUtils) {
+            phoneInput.value = phoneInstance.getNumber(
+              window.intlTelInputUtils.numberFormat.NATIONAL,
+            );
+          }
+          return;
+        }
+
+        if (raw.startsWith("591") && raw.length > 8) {
+          phoneInput.value = raw.slice(3);
+        }
+      };
+
+      phoneInput.addEventListener("blur", normalizePhoneInput);
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         phoneError.style.display = "none";
@@ -518,6 +541,8 @@
           phoneError.style.display = "block";
           return;
         }
+
+        normalizePhoneInput();
 
         if (!phoneInstance.isValidNumber()) {
           phoneError.textContent = "Ingresa un numero valido.";
